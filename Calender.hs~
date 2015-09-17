@@ -95,6 +95,15 @@ createDay = do
 	cal <- T.toCalendarTime c
 	return (Day (T.ctDay cal) [])	
 
+addYearToCalendar:: Year -> Calendar -> Calendar
+addYearToCalendar (Year i ms) (Calendar xs) = Calendar ys
+	where
+		us = filter (i /= getYearNumber) xs
+		ys = (Year i ms):us 
+
+getYearNumber:: Year -> Int 
+getYearNumber (Year i _ ) = i
+
 createEvent::Title -> Event
 createEvent title = Event title 
 
@@ -156,7 +165,7 @@ removeEventFromMonth e i m  = case getDayFromMonth i m of
 	Just d 	-> Month n ds
 		where
 		Month n ds2 = m
-		r  = filter (d==) ds2
+		r  = filter (d/=) ds2
 		ds = (removeEventFromDay e d):r
 
 removeEventFromYear::Event -> Int -> Int -> Year -> Year
@@ -165,7 +174,7 @@ removeEventFromYear e m d year = case getMonthFromYear m year of
 	Just mm -> Year i newM
 		where
 		Year i oldM = year 
-		r  = filter (mm==) oldM
+		r  = filter (mm/=) oldM
 		newM = (removeEventFromMonth e d mm):r
 
 

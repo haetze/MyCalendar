@@ -95,6 +95,15 @@ createDay = do
 	cal <- T.toCalendarTime c
 	return (Day (T.ctDay cal) [])	
 
+addYearToCalendar:: Year -> Calendar -> Calendar
+addYearToCalendar (Year i ms) (Calendar xs) = Calendar ys
+	where
+		us = filter (\s -> i /= getYearNumber s) xs
+		ys = (Year i ms):us 
+
+getYearNumber:: Year -> Int 
+getYearNumber (Year i _ ) = i
+
 createEvent::Title -> Event
 createEvent title = Event title 
 
