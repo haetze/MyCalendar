@@ -5,12 +5,14 @@
 --
 -- Distributed under terms of the MIT license.
 --
+{-#LANGUAGE BangPatterns #-}
 
 module Calender where
 
 import qualified System.Time as T
 import System.Directory
 import System.IO
+import Data.List
 
 type Title = String
 -- hh mm"
@@ -156,7 +158,10 @@ addEventToYear e m d year@(Year y ms) = case getMonthFromYear m year of
 removeEventFromDay::Event -> Day -> Day
 removeEventFromDay e (Day i es) = Day i es2
 	where
-		es2 = filter (e/=) es
+		es2 = filter (f e) es
+		f::Event -> Event -> Bool
+		f e (EventWithTime t _) = f e $ Event t
+		f e e2		        = (e /= e2)
 
 removeEventFromMonth:: Event -> Int -> Month -> Month
 removeEventFromMonth e i m  = case getDayFromMonth i m of
@@ -179,11 +184,11 @@ removeEventFromYear e m d year = case getMonthFromYear m year of
 
 
 showEventsFromDay:: Maybe Day -> [String]
-showEventsFromDay Nothing = ["\tYou have now events on this day."]
+showEventsFromDay Nothing = ["\tYou have no events on this day. "]
 showEventsFromDay (Just (Day n es)) = do
 	let x = "Your Events for the " ++ show n++".\n"
-	let m =   map (addNewLine . addTabs . showEventsWithTime) es3
-	let y =   map (addNewLine . addTabs . show) es2
+	let m =   map (addNewLine . addTabs . showEventsWithTime ) $ ms es3
+	let y =   map (addNewLine . addTabs . show ) es2
 	(x:m) ++ y
 	where
 	es2 = filter ( f) es
@@ -193,15 +198,44 @@ showEventsFromDay (Just (Day n es)) = do
 	f _		      = True
 	ff::Event -> Bool 
 	ff x = not $ f x
+	ms:: [Event] -> [Event]
+	ms = sort
+
+instance Ord Event where 
+	(EventWithTime t xs) < (EventWithTime t2 ys) = converToNumber xs < converToNumber ys
+	(EventWithTime t xs) <= (EventWithTime t2 ys) = converToNumber xs <= converToNumber ys
+	(EventWithTime t xs) > (EventWithTime t2 ys) = converToNumber xs > converToNumber ys
+	(EventWithTime t xs) >= (EventWithTime t2 ys) = converToNumber xs >= converToNumber ys
+	--(EventWithTime t xs) `min` (EventWithTime t2 ys) = converToNumber xs `min` converToNumber ys
+	--(EventWithTime t xs) `max` (EventWithTime t2 ys) = converToNumber xs `max` converToNumber ys
+
+converToNumber::String -> Double
+converToNumber xs = read $ t ++"."++s
+	where
+		ts = words xs
+		t  = head ts
+		s  = head $ tail ts
+
+
 
 showEventsWithTime::Event -> String
-showEventsWithTime (EventWithTime title time) = "You have "++ title ++ " at " ++ t
+showEventsWithTime (EventWithTime title time) = reverse . tail . reverse $ "You have "++ title ++ " at " ++ t
 	where
 	ts = words time 
 	t = join ts ":"
 	join::[[a]] -> [a] -> [a]
 	join []     _ = []
 	join (x:xs) j = (x ++ j) ++ (join xs j)
+
+timeCorrectionMin::String -> String
+timeCorrectionMin xs | length xs == 1 = xs ++ "0"
+	| length xs == 2 = xs
+	|otherwise 	 = error "Wrong time format"
+
+timeCorrectionHour:: String -> String
+timeCorrectionHour xs | length xs == 1 = "0"++xs
+		      | length xs == 2 = xs
+		      |otherwise       = error "Wrong time format"
 
 
 
@@ -212,7 +246,7 @@ addNewLine:: String -> String
 addNewLine x = x ++ "\n"
 
 showEventsFromMonth:: Maybe Month -> [String]
-showEventsFromMonth Nothing = ["\tYou have in this month.\n"]
+showEventsFromMonth Nothing = ["\tYou have in this no events month.\n"]
 showEventsFromMonth (Just (Month i ds)) = do
 	let y = "Month Number " ++ show i++".\n"
 	let x = map (showEventsFromDay . Just ) ds
@@ -221,13 +255,13 @@ showEventsFromMonth (Just (Month i ds)) = do
 	map addTabs e	
 
 showEventsFromDayInMonth::Int -> Maybe Month -> [String]
-showEventsFromDayInMonth _ Nothing = ["\tYou have no events on this day.\n"]
+showEventsFromDayInMonth _ Nothing = ["\tYou have no events on this day.\n "]
 showEventsFromDayInMonth i (Just m) = case getDayFromMonth i m of
 	Nothing -> ["\tNothing to do today!\n"]
 	Just d -> showEventsFromDay (Just d)
 
 showEventsFromMonthInYear:: Int -> Maybe Year -> [String]
-showEventsFromMonthInYear _ Nothing = ["\tYou have no events in this year\n"]
+showEventsFromMonthInYear _ Nothing = ["\tYou have no events in this year \n"]
 showEventsFromMonthInYear x (Just year) = case getMonthFromYear x year of 
 	Nothing -> ["\tNo Events for this Month\n"]
 	Just m -> map addTabs e
@@ -241,7 +275,8 @@ getMyCalendar = do
 	home <- getHomeDirectory
 	let file = home ++ "/.calendar"
 	contents <- readFile file
-	return $ read contents
+	let r = read contents
+	return (r)
 
 putMyCalendar::Calendar -> IO ()
 putMyCalendar calendar = do
@@ -250,3 +285,6 @@ putMyCalendar calendar = do
 	writeFile file $ show calendar
 
 
+
+f::Int -> Int
+f x = x

@@ -10,9 +10,20 @@
 import System.Environment(getArgs)
 import System.IO
 import Calender 
+import Control.Exception
 --import qualified System.Time as T
+--
 
-main = do
+main = handle f pro
+	where 
+	f::SomeException -> IO ()	
+	f x = do
+		putStrLn $ "some error happend, creating new Calendar"
+		c <- createYear
+		putMyCalendar $ Calendar [c]
+	
+
+pro = do
 	!calendar <- getMyCalendar
 	y	 <- year
 	m	 <- month
@@ -48,7 +59,9 @@ main = do
 					let Just y = addEventToYear e m d thisYear
 					putMyCalendar $ addYearToCalendar y calendar
 				"addEventWithTimeToday":h:m2:xs -> do
-					let e = EventWithTime (unwords xs) (h++" "++m2)
+					let h2 = timeCorrectionHour h
+					let m3 = timeCorrectionMin m2
+					let e = EventWithTime (unwords xs) (h2++" "++m3)
 					let Just y = addEventToYear e m d thisYear
 					putMyCalendar $ addYearToCalendar y calendar
 				"addEventOnDay":x:xs -> do
