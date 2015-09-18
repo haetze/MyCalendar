@@ -13,9 +13,12 @@ import System.Directory
 import System.IO
 
 type Title = String
+-- hh mm"
+type Time = String 
 
 data Event = Event Title |
-	EventDue Title
+	EventDue Title |
+	EventWithTime Title Time 
 	deriving(Show, Read, Eq)
 
 data Day = Day Int [Event]
@@ -57,10 +60,6 @@ month = do
 	c <- T.getClockTime
 	cal <- T.toCalendarTime c
 	return . toMonthNumber $ T.ctMonth cal
-
-
-
-
 
 
 createMonthWithInt::Int -> Month
@@ -157,7 +156,10 @@ addEventToYear e m d year@(Year y ms) = case getMonthFromYear m year of
 removeEventFromDay::Event -> Day -> Day
 removeEventFromDay e (Day i es) = Day i es2
 	where
-		es2 = filter (e/=) es
+		es2 = filter (f e) es
+		f::Event -> Event -> Bool
+		f e (EventWithTime t _) = f e $ Event t
+		f e e2		        = (e /= e2)
 
 removeEventFromMonth:: Event -> Int -> Month -> Month
 removeEventFromMonth e i m  = case getDayFromMonth i m of
@@ -183,8 +185,28 @@ showEventsFromDay:: Maybe Day -> [String]
 showEventsFromDay Nothing = ["\tYou have now events on this day."]
 showEventsFromDay (Just (Day n es)) = do
 	let x = "Your Events for the " ++ show n++".\n"
-	let y =   map (addNewLine . addTabs . show) es
-	x:y
+	let m =   map (addNewLine . addTabs . showEventsWithTime) es3
+	let y =   map (addNewLine . addTabs . show) es2
+	(x:m) ++ y
+	where
+	es2 = filter ( f) es
+	es3 = filter (ff) es
+	f::Event -> Bool
+	f (EventWithTime _ _) = False
+	f _		      = True
+	ff::Event -> Bool 
+	ff x = not $ f x
+
+showEventsWithTime::Event -> String
+showEventsWithTime (EventWithTime title time) = "You have "++ title ++ " at " ++ t
+	where
+	ts = words time 
+	t = join ts ":"
+	join::[[a]] -> [a] -> [a]
+	join []     _ = []
+	join (x:xs) j = (x ++ j) ++ (join xs j)
+
+
 
 addTabs:: String -> String
 addTabs x = "\t" ++ x

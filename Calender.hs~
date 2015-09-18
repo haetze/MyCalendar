@@ -13,9 +13,12 @@ import System.Directory
 import System.IO
 
 type Title = String
+-- hh mm"
+type Time = String 
 
 data Event = Event Title |
-	EventDue Title
+	EventDue Title |
+	EventWithTime Title Time 
 	deriving(Show, Read, Eq)
 
 data Day = Day Int [Event]
@@ -59,10 +62,6 @@ month = do
 	return . toMonthNumber $ T.ctMonth cal
 
 
-
-
-
-
 createMonthWithInt::Int -> Month
 createMonthWithInt x = Month x []
 
@@ -98,7 +97,7 @@ createDay = do
 addYearToCalendar:: Year -> Calendar -> Calendar
 addYearToCalendar (Year i ms) (Calendar xs) = Calendar ys
 	where
-		us = filter (i /= getYearNumber) xs
+		us = filter (\s -> i /= getYearNumber s) xs
 		ys = (Year i ms):us 
 
 getYearNumber:: Year -> Int 
@@ -183,8 +182,28 @@ showEventsFromDay:: Maybe Day -> [String]
 showEventsFromDay Nothing = ["\tYou have now events on this day."]
 showEventsFromDay (Just (Day n es)) = do
 	let x = "Your Events for the " ++ show n++".\n"
-	let y =   map (addNewLine . addTabs . show) es
-	x:y
+	let m =   map (addNewLine . addTabs . showEventsWithTime) es3
+	let y =   map (addNewLine . addTabs . show) es2
+	(x:m) ++ y
+	where
+	es2 = filter ( f) es
+	es3 = filter (ff) es
+	f::Event -> Bool
+	f (EventWithTime _ _) = False
+	f _		      = True
+	ff::Event -> Bool 
+	ff x = not $ f x
+
+showEventsWithTime::Event -> String
+showEventsWithTime (EventWithTime title time) = "You have "++ title ++ " at " ++ t
+	where
+	ts = words time 
+	t = join ts ":"
+	join::[[a]] -> [a] -> [a]
+	join []     _ = []
+	join (x:xs) j = (x ++ j) ++ (join xs j)
+
+
 
 addTabs:: String -> String
 addTabs x = "\t" ++ x
