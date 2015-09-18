@@ -18,9 +18,13 @@ main = handle f pro
 	where 
 	f::SomeException -> IO ()	
 	f x = do
-		putStrLn $ "some error happend, creating new Calendar"
-		c <- createYear
-		putMyCalendar $ Calendar [c]
+		case show x of 
+			"Wrong time format" ->
+				putStrLn $ "Your time looks fishy, check that and try again."
+			_ ->do  
+				putStrLn $ "some error happend, creating new Calendar."
+				c <- createYear
+				putMyCalendar $ Calendar [c]
 	
 
 pro = do
@@ -59,10 +63,22 @@ pro = do
 					let Just y = addEventToYear e m d thisYear
 					putMyCalendar $ addYearToCalendar y calendar
 				"addEventWithTimeToday":h:m2:xs -> do
-					let h2 = timeCorrectionHour h
-					let m3 = timeCorrectionMin m2
+					let !h2 = timeCorrectionHour h
+					let !m3 = timeCorrectionMin m2
 					let e = EventWithTime (unwords xs) (h2++" "++m3)
 					let Just y = addEventToYear e m d thisYear
+					putMyCalendar $ addYearToCalendar y calendar
+				"addEventWithTimeOnDay":h:m2:x:xs -> do
+					let !h2 = timeCorrectionHour h
+					let !m3 = timeCorrectionMin m2
+					let e = EventWithTime (unwords xs) (h2++" "++m3)
+					let Just y = addEventToYear e m (read x) thisYear
+					putMyCalendar $ addYearToCalendar y calendar 
+				"addEventWithTimeOnDayInMonth":h:m2:x:u:xs -> do
+					let !h2 = timeCorrectionHour h
+					let !m3 = timeCorrectionMin m2
+					let e = EventWithTime (unwords xs) (h2++" "++m3)
+					let Just y = addEventToYear e (read u) (read x) thisYear
 					putMyCalendar $ addYearToCalendar y calendar
 				"addEventOnDay":x:xs -> do
 					let e = Event $ unwords xs
@@ -114,6 +130,8 @@ pro = do
 					putStrLn "\taddEventOnDayInMonth <Day #> <Month #> <Event title, can be more than one word>"
 					putStrLn "\taddEventOnDayInMonthInYear <Day #> <Month #> <Event title, can be more than one word>"
 					putStrLn "\taddEventWithTimeToday <Hour> <Minutes> <Event title, can be more than one word>"
+					putStrLn "\taddEventWithTimeOnDay <Hour> <Minutes> <Day #> <Event title, can be more than one word>"
+					putStrLn "\taddEventWithTimeOnDay <Hour> <Minutes> <Day #> <Month #> <Event title, can be more than one word>"
 					putStrLn "\tremoveEventToday <Event title, can be more than one word>"
 					putStrLn "\tremoveEventOnDay <Day #> <Event title, can be more than one word>"
 					putStrLn "\tremoveEventOnDayInMonth <Day #> <Month #> <Event, title, can be more than one word>"

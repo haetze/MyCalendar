@@ -35,6 +35,20 @@ data Year = Year Int [Month]
 data Calendar = Calendar [Year]
 	deriving(Show, Read, Eq)
 
+instance Ord Event where 
+	(EventWithTime t xs) < (EventWithTime t2 ys) = converToNumber xs < converToNumber ys
+	(EventWithTime t xs) <= (EventWithTime t2 ys) = converToNumber xs <= converToNumber ys
+	(EventWithTime t xs) > (EventWithTime t2 ys) = converToNumber xs > converToNumber ys
+	(EventWithTime t xs) >= (EventWithTime t2 ys) = converToNumber xs >= converToNumber ys
+	--(EventWithTime t xs) `min` (EventWithTime t2 ys) = converToNumber xs `min` converToNumber ys
+	--(EventWithTime t xs) `max` (EventWithTime t2 ys) = converToNumber xs `max` converToNumber ys
+
+instance Ord Day where
+	(Day n _) > (Day m _) = n > m
+	(Day n _) >= (Day m _) = n > m
+	(Day n _) < (Day m _) = n > m
+	(Day n _) <= (Day m _) = n > m
+	
 createYearWithInt::Int -> Year
 createYearWithInt x = Year x []
 
@@ -185,10 +199,11 @@ removeEventFromYear e m d year = case getMonthFromYear m year of
 
 showEventsFromDay:: Maybe Day -> [String]
 showEventsFromDay Nothing = ["\tYou have no events on this day. "]
+showEventsFromDay (Just (Day n [])) = [""]
 showEventsFromDay (Just (Day n es)) = do
 	let x = "Your Events for the " ++ show n++".\n"
 	let m =   map (addNewLine . addTabs . showEventsWithTime ) $ ms es3
-	let y =   map (addNewLine . addTabs . show ) es2
+	let y =   map (addNewLine .addTabs . show ) es2
 	(x:m) ++ y
 	where
 	es2 = filter ( f) es
@@ -201,13 +216,6 @@ showEventsFromDay (Just (Day n es)) = do
 	ms:: [Event] -> [Event]
 	ms = sort
 
-instance Ord Event where 
-	(EventWithTime t xs) < (EventWithTime t2 ys) = converToNumber xs < converToNumber ys
-	(EventWithTime t xs) <= (EventWithTime t2 ys) = converToNumber xs <= converToNumber ys
-	(EventWithTime t xs) > (EventWithTime t2 ys) = converToNumber xs > converToNumber ys
-	(EventWithTime t xs) >= (EventWithTime t2 ys) = converToNumber xs >= converToNumber ys
-	--(EventWithTime t xs) `min` (EventWithTime t2 ys) = converToNumber xs `min` converToNumber ys
-	--(EventWithTime t xs) `max` (EventWithTime t2 ys) = converToNumber xs `max` converToNumber ys
 
 converToNumber::String -> Double
 converToNumber xs = read $ t ++"."++s
@@ -249,10 +257,10 @@ showEventsFromMonth:: Maybe Month -> [String]
 showEventsFromMonth Nothing = ["\tYou have in this no events month.\n"]
 showEventsFromMonth (Just (Month i ds)) = do
 	let y = "Month Number " ++ show i++".\n"
-	let x = map (showEventsFromDay . Just ) ds
+	let x = map (showEventsFromDay . Just ) . reverse $ sort ds
 	let w = concat x
-	let e = y:w
-	map addTabs e	
+	y:w
+		
 
 showEventsFromDayInMonth::Int -> Maybe Month -> [String]
 showEventsFromDayInMonth _ Nothing = ["\tYou have no events on this day.\n "]
