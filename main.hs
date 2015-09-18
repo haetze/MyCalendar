@@ -46,7 +46,11 @@ main = do
 				"addEventToday":xs -> do
 					let e = Event $ unwords xs
 					let Just y = addEventToYear e m d thisYear
-					putMyCalendar $ Calendar [y]
+					putMyCalendar $ addYearToCalendar y calendar
+				"addEventWithTimeToday":h:m2:xs -> do
+					let e = EventWithTime (unwords xs) (h++" "++m2)
+					let Just y = addEventToYear e m d thisYear
+					putMyCalendar $ addYearToCalendar y calendar
 				"addEventOnDay":x:xs -> do
 					let e = Event $ unwords xs
 					let Just y = addEventToYear e m (read x) thisYear
@@ -96,6 +100,7 @@ main = do
 					putStrLn "\taddEventOnDay <Day #> <Event title, can be more than one word>"
 					putStrLn "\taddEventOnDayInMonth <Day #> <Month #> <Event title, can be more than one word>"
 					putStrLn "\taddEventOnDayInMonthInYear <Day #> <Month #> <Event title, can be more than one word>"
+					putStrLn "\taddEventWithTimeToday <Hour> <Minutes> <Event title, can be more than one word>"
 					putStrLn "\tremoveEventToday <Event title, can be more than one word>"
 					putStrLn "\tremoveEventOnDay <Day #> <Event title, can be more than one word>"
 					putStrLn "\tremoveEventOnDayInMonth <Day #> <Month #> <Event, title, can be more than one word>"
