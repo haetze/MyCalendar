@@ -11,8 +11,6 @@ import System.Environment(getArgs)
 import System.IO
 import Calender 
 import Control.Exception
---import qualified System.Time as T
---
 
 main = handle f pro
 	where 
