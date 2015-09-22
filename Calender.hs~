@@ -259,8 +259,8 @@ showEventsFromMonth (Just (Month i ds)) = do
 	let y = "Month Number " ++ show i++".\n"
 	let x = map (showEventsFromDay . Just ) . reverse $ sort ds
 	let w = concat x
-	let e = y:w
-	map addTabs e	
+	y:w
+		
 
 showEventsFromDayInMonth::Int -> Maybe Month -> [String]
 showEventsFromDayInMonth _ Nothing = ["\tYou have no events on this day.\n "]
