@@ -296,3 +296,16 @@ putMyCalendar calendar = do
 
 f::Int -> Int
 f x = x
+
+checkCalender:: IO Calendar
+checkCalender = getHomeDirectory >>= getDirectoryContents >>= isElem
+
+isElem::[FilePath] -> IO Calendar
+isElem xs = do 
+  case ".calendar" `elem` xs of
+    True -> getMyCalendar
+    False -> do
+      c <- createYear
+      putMyCalendar $ Calendar [c]
+      return $ Calendar [c]
+  

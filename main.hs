@@ -21,13 +21,13 @@ main = handle f pro
         "Wrong time format" ->
           putStrLn $ "Your time looks fishy, check that and try again."
         _ -> do  
-          (putStrLn $ "some error happend, creating new Calendar.")
-          c <- createYear
-          putMyCalendar $ Calendar [c]
+          (putStrLn $ "some error happend, run showDay and check if the program still crashes if yes your calendar is corrupted, delete it!")
+          --c <- createYear
+          --putMyCalendar $ Calendar [c]
   
 
 pro = do
-  !calendar <- getMyCalendar
+  !calendar <- checkCalender
   y   <- year
   m   <- month
   d    <- today
