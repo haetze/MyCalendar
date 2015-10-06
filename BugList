@@ -1,5 +1,5 @@
-#   Bug                               State (Open/Review/Fxed)
+#   Bug                               State (Open/Review/Fxed) Date
 
-1   Corrupts ~/.calendar on           Open
+1   Corrupts ~/.calendar on           Open                     10/06/2015
     addEventOnDay when <Day #>
     isn't an integer
