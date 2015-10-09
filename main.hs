@@ -20,6 +20,8 @@ main = handle f pro
        case show x of 
         "Wrong time format" ->
           putStrLn $ "Your time looks fishy, check that and try again."
+        "Prelude.read: no parse" -> 
+            putStrLn "Your input appears to be wrong formatted, run showDay to check the integraty of your ~/.calendar"
         _ -> do  
           (putStrLn $ "some error happend, run showDay and check if the program still crashes if yes your calendar is corrupted, delete it!")
           --c <- createYear
@@ -49,12 +51,16 @@ pro = do
           let xs = showEventsFromDay day
           putStr $ concat xs
         "showDayInMonth":n:_ -> do
-          let day = getDayFromMonthFromYear m (read n) (Just thisYear)
+          let !n2 = (read n)
+          let day = getDayFromMonthFromYear m n2 (Just thisYear)
           let xs = showEventsFromDay day
           putStr $ concat xs
         "showDayInMonthInYear":x:u:w:_ -> do
-          let p = getYearFromCalendar (read w) calendar 
-          let day = getDayFromMonthFromYear (read u) (read x) p
+          let !n2 = (read w)
+          let !n3 = (read u)
+          let !n4 = (read x)
+          let p = getYearFromCalendar n2 calendar 
+          let day = getDayFromMonthFromYear n3 n4 p
           let xs = showEventsFromDay day
           putStr $ concat xs
         "addEventToday":xs -> do
@@ -71,32 +77,44 @@ pro = do
           let !h2 = timeCorrectionHour h
           let !m3 = timeCorrectionMin m2
           let e = EventWithTime (unwords xs) (h2++" "++m3)
-          let Just y = addEventToYear e m (read x) thisYear
+          let !n2 = (read x)
+          let Just y = addEventToYear e m n2 thisYear
           putMyCalendar $ addYearToCalendar y calendar 
         "addEventWithTimeOnDayInMonth":h:m2:x:u:xs -> do
           let !h2 = timeCorrectionHour h
           let !m3 = timeCorrectionMin m2
           let e = EventWithTime (unwords xs) (h2++" "++m3)
-          let Just y = addEventToYear e (read u) (read x) thisYear
+          let !n3 = (read x)
+          let !n2 = (read u)
+          let Just y = addEventToYear e n2 n3 thisYear
           putMyCalendar $ addYearToCalendar y calendar
         "addEventOnDay":x:xs -> do
           let e = Event $ unwords xs
-          let Just y = addEventToYear e m (read x) thisYear
+          let !n2 = (read x)
+          let Just y = addEventToYear e m n2 thisYear
           putMyCalendar $ addYearToCalendar y calendar
         "addEventOnDayInMonth":x:y:xs -> do
           let e = Event $ unwords xs
-          let Just y2 = addEventToYear e (read y) (read x) thisYear
+          let !n2 = (read y)
+          let !n3 = (read x)
+          let Just y2 = addEventToYear e n2 n3 thisYear
           putMyCalendar $ addYearToCalendar y2 calendar 
         "addEventOnDayInMonthInYear":x:u:w:xs -> do
           let e = Event $ unwords xs
-          let p = getYearFromCalendar (read w) calendar
+          let !n2 = (read w)
+          let p = getYearFromCalendar n2 calendar
           case p of
             Nothing -> do
-              let q = createYearWithInt (read w)
-              let Just y2 = addEventToYear e (read u) (read x) q
+              let !n2 = (read w)
+              let q = createYearWithInt n2 
+              let !n3 = (read u)
+              let !n4 = (read x)
+              let Just y2 = addEventToYear e n3 n4 q
               putMyCalendar $ addYearToCalendar y2 calendar
             Just q -> do 
-              let Just y2 = addEventToYear e (read u) (read x) q
+              let !n2 = (read u)
+              let !n3 = (read x)
+              let Just y2 = addEventToYear e n2 n3 q
               putMyCalendar $ addYearToCalendar y2 calendar
         "removeEventToday":xs -> do 
           let e = Event $ unwords xs
@@ -104,19 +122,25 @@ pro = do
           putMyCalendar $ addYearToCalendar y calendar 
         "removeEventOnDay":x:xs -> do
           let e = Event $ unwords xs
-          let y = removeEventFromYear e m (read x) thisYear    
+          let !n2 = read x
+          let y = removeEventFromYear e m n2 thisYear    
           putMyCalendar $ addYearToCalendar y calendar
         "removeEventOnDayInMonth":x:y:xs -> do
           let e = Event $ unwords xs
-          let y2 = removeEventFromYear e (read y) (read x) thisYear
+          let !n2 = (read y)
+          let !n3 = (read x)
+          let y2 = removeEventFromYear e n2 n3 thisYear
           putMyCalendar $ addYearToCalendar y2 calendar
         "removeEventOnDayInMonthInyear":x:u:w:xs -> do  
           let e = Event $ unwords xs
-          let p = getYearFromCalendar (read w) calendar
+          let !n2 = read w
+          let p = getYearFromCalendar n2 calendar
           case p of 
             Nothing -> return ()
             Just q  -> do
-              let y2 = removeEventFromYear e (read u) (read x) q
+              let !n2 = (read u)
+              let !n3 = (read x)
+              let y2 = removeEventFromYear e n2 n3 q
               putMyCalendar $ addYearToCalendar y2 calendar
         _ -> do
           putStrLn "unknown Command\nKnown Commands:"
