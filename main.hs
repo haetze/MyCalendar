@@ -151,6 +151,7 @@ pro = do
           putStrLn "unknown Command\nKnown Commands:"
           putStrLn "\tshowDay"
           putStrLn "\tshowMonth"
+          putStrLn "\tshowMonthNumber <Month #>"
           putStrLn "\tshowDayInMonth <Day #>"
           putStrLn "\tshowDayInMonthInYear <Day #> <Month #> <Year #>"
           putStrLn "\taddEventToday <Event title, can be more than one word>"
