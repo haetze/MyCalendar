@@ -50,6 +50,11 @@ pro = do
           let day = getDayFromMonthFromYear m d (Just thisYear) 
           let xs = showEventsFromDay day
           putStr $ concat xs
+        "showMonthNumber":n:_ -> do
+          let !n2 = read n
+          let thisMonth = getMonthFromYear n2 thisYear
+          let xs = showEventsFromMonth thisMonth
+          putStr $ concat xs 
         "showDayInMonth":n:_ -> do
           let !n2 = (read n)
           let day = getDayFromMonthFromYear m n2 (Just thisYear)
