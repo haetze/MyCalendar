@@ -1,6 +1,8 @@
-#   Bug                               State (Open/Review/Fixed) Date
+#   Bug                               State (OPEN/REVIEW/FIXED) Date
 
-1   Corrupts ~/.calendar on           Fixed                     10/06/2015
+1   Corrupts ~/.calendar on           FIXED                     10/06/2015
     addEventOnDay when <Day #>
     isn't an integer
+
+2   no make file/no automated install OPEN                      11/03/2015
 
