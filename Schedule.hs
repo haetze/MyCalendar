@@ -11,6 +11,7 @@ module Schedule where
 
 
 import Data.List
+import System.IO
 
 
 --Time
@@ -25,7 +26,7 @@ data Time = Time (Int, Int)
 --event
 --the name of the event should be short (ca. 4 charcacters)
 --hold an event, name, start time, end time
-data Event = Event String Time Time
+data Event = Event String Time
   deriving(Show, Read, Eq)
 
 --Day 
@@ -35,7 +36,7 @@ type Day = (String, [Event])
 
 --Week 
 --a list of days
-type Week = [Day]
+data Week = Week [Day]
 
 --Ord instances for Time and therefore Event
 instance Ord Time where
@@ -49,9 +50,64 @@ instance Ord Time where
                 | otherwise = x <= u
 
 instance Ord Event where
-  (Event _ t _ ) < (Event _ u _) = t < u
-  (Event _ t _ ) > (Event _ u _) = t > u
-  (Event _ t _ ) <= (Event _ u _) = t <= u
-  (Event _ t _ ) >= (Event _ u _) = t >= u
+  (Event _ t) < (Event _ u) = t < u
+  (Event _ t) > (Event _ u) = t > u
+  (Event _ t) <= (Event _ u) = t <= u
+  (Event _ t) >= (Event _ u) = t >= u
 --End Ord instance 
+
+--Print for Time
+
+toString:: Time -> String
+toString (Time (n, u)) = show n ++ ":" ++ show u
+
+nextTime:: Time -> Time
+nextTime (Time (23,30))= Time (0, 0)
+nextTime (Time (x, 0)) = Time (x, 30)
+nextTime (Time (x, 30)) = Time (x + 1, 0)
+
+createDay:: String -> IO Day
+createDay x = do
+  u <- createEventList (Time (0, 0))
+  return (x, u)
+
+createEventList::Time -> IO [Event]
+createEventList t@(Time (x, y)) = do
+  case t of 
+    Time (23, 30) -> do
+      e <- createEventAt t 
+      return [e]
+    _ -> do 
+      e <- createEventAt t
+      es <- createEventList (nextTime t) 
+      return (e:es)
+
+
+createEventAt:: Time -> IO Event
+createEventAt t = do
+  putStr $ "Event at " ++ toString t ++ ":"
+  name <- getLine 
+  case length name of
+    0 -> return $ Event name t --I later want to change this behavior
+    _ -> return $ Event name t 
+
+createWeek::IO Week 
+createWeek = do
+  monday <- createDay "Monday"
+  tuesday <- createDay "Tuesday"
+  wednesday <- createDay "Wednesday"
+  thursday <- createDay "Thursday"
+  friday <- createDay "Friday"
+  saturday <- createDay "Saturday"
+  sunday <- createDay "Sunday"
+  return $ Week [monday,tuesday,wednesday,thursday,friday,saturday,sunday] 
+
+
+
+
+
+
+
+
+
 
