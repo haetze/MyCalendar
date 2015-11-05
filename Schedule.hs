@@ -6,10 +6,12 @@
 -- 
 --This file is the starting point for the weekly schedule implemantion
 
+{-#LANGUAGE BangPatterns #-}
 
 module Schedule where
 
 
+import System.Directory
 import Data.List
 import System.IO
 
@@ -37,6 +39,7 @@ type Day = (String, [Event])
 --Week 
 --a list of days
 data Week = Week [Day]
+  deriving(Read, Show)
 
 --Ord instances for Time and therefore Event
 instance Ord Time where
@@ -60,6 +63,9 @@ instance Ord Event where
 
 toString:: Time -> String
 toString (Time (n, u)) = show n ++ ":" ++ show u
+
+toStringEvent:: Event -> String
+toStringEvent (Event n _) = n
 
 nextTime:: Time -> Time
 nextTime (Time (23,30))= Time (0, 0)
@@ -89,7 +95,9 @@ createEventAt t = do
   name <- getLine 
   case length name of
     0 -> return $ Event name t --I later want to change this behavior
-    _ -> return $ Event name t 
+    _ -> case length name < 6 of
+      True -> return $ Event name t
+      False -> return $ Event (take 5 name) t  
 
 createWeek::IO Week 
 createWeek = do
@@ -101,6 +109,84 @@ createWeek = do
   saturday <- createDay "Saturday"
   sunday <- createDay "Sunday"
   return $ Week [monday,tuesday,wednesday,thursday,friday,saturday,sunday] 
+
+printWeekFromTo::Week -> Time -> Time -> IO ()
+printWeekFromTo (Week days) t1 t2 = do
+  putStr "00:00\tM   \tT   \tW   \tTh \tF  \tS   \tSu\n"
+  let x = createLines days t1 t2 
+  putStr $ concat x
+
+
+
+printWeek:: Week -> IO ()
+printWeek (Week days) = do
+  putStr "00:00\tM   \tT   \tW   \tTh \tF  \tS   \tSu\n"
+  let !x = createLines days (Time (0, 0)) (Time (23, 30))
+  putStr $ concat x
+
+createLines:: [Day] ->Time -> Time -> [String]
+createLines days t1 t2 = createLinesFromTime days t1 t2
+
+createLinesFromTime:: [Day] -> Time -> Time -> [String]
+createLinesFromTime days t1 t2 | t1 == t2 = q:[]
+  where
+  q = toString t1 ++ "\t" ++ timeLine days t1
+createLinesFromTime days t1 t3 = q:u
+  where
+  q = toString t1 ++ "\t" ++ timeLine days t1  
+  u = createLinesFromTime days t2 t3
+  t2 = nextTime t1
+
+
+timeLine:: [Day] -> Time -> String 
+timeLine ds t = (concat $ map (eventAtTime t) ds) ++ "\n"
+
+eventAtTime::Time -> Day -> String
+eventAtTime _ (_, []) = ""
+eventAtTime t (m, (Event n z):es) | t == z = n ++ "\t" 
+                                  | otherwise = eventAtTime t (m, es)
+
+
+--File Read Write Area 
+-- ==========================================
+--
+--
+--
+--
+--
+--
+--
+--
+
+getMyWeek:: IO Week
+getMyWeek = do
+  home <- getHomeDirectory
+  let file = home ++ "/.week"
+  contents <- readFile file
+  let r = read contents
+  return (r)
+
+putMyWeek::Week -> IO ()
+putMyWeek week = do
+  home <- getHomeDirectory
+  let file = home ++ "/.week"
+  writeFile file $ show week
+
+
+checkWeek:: IO Week
+checkWeek = getHomeDirectory >>= getDirectoryContents >>= isElem2
+
+isElem2::[FilePath] -> IO Week
+isElem2 xs = do 
+  case ".week" `elem` xs of
+    True -> getMyWeek
+    False -> do
+      week <- createWeek
+      putMyWeek $ week
+      return $ week
+
+--File Read Write Area End
+
 
 
 
