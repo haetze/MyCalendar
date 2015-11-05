@@ -8,7 +8,14 @@
 
 {-#LANGUAGE BangPatterns #-}
 
-module Schedule where
+module Schedule (
+  createWeek,
+  checkWeek,
+  putMyWeek,
+  getMyWeek,
+  printWeekFromTo,
+  printWeek
+) where
 
 
 import System.Directory
