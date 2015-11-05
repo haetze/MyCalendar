@@ -14,7 +14,11 @@ module Schedule (
   putMyWeek,
   getMyWeek,
   printWeekFromTo,
-  printWeek
+  printWeek,
+  createTime,
+  createDay,
+  createEventList,
+  createEventAt
 ) where
 
 
@@ -30,6 +34,9 @@ import System.IO
 --
 data Time = Time (Int, Int)
   deriving(Show, Read, Eq)
+
+createTime::Int -> Int -> Time
+createTime x y = Time (x, y)
 
 
 --event
@@ -81,7 +88,7 @@ nextTime (Time (x, 30)) = Time (x + 1, 0)
 
 createDay:: String -> IO Day
 createDay x = do
-  u <- createEventList (Time (0, 0))
+  !u <- createEventList (Time (0, 0))
   return (x, u)
 
 createEventList::Time -> IO [Event]
@@ -91,16 +98,19 @@ createEventList t@(Time (x, y)) = do
       e <- createEventAt t 
       return [e]
     _ -> do 
-      e <- createEventAt t
-      es <- createEventList (nextTime t) 
+      !e <- createEventAt t
+      !es <- createEventList (nextTime t) 
       return (e:es)
 
 
 createEventAt:: Time -> IO Event
-createEventAt t = do
-  putStr $ "Event at " ++ toString t ++ ":"
-  name <- getLine 
-  case length name of
+createEventAt t = s >> y >>= f 
+  where
+  s = do  
+    putStr $ "Event at " ++ toString t ++ ":"
+    hFlush stdout
+  y = getLine
+  f name  = case length name of
     0 -> return $ Event name t --I later want to change this behavior
     _ -> case length name < 6 of
       True -> return $ Event name t
@@ -167,15 +177,15 @@ eventAtTime t (m, (Event n z):es) | t == z = n ++ "\t"
 
 getMyWeek:: IO Week
 getMyWeek = do
-  home <- getHomeDirectory
+  !home <- getHomeDirectory
   let file = home ++ "/.week"
-  contents <- readFile file
+  !contents <- readFile file
   let r = read contents
   return (r)
 
 putMyWeek::Week -> IO ()
 putMyWeek week = do
-  home <- getHomeDirectory
+  !home <- getHomeDirectory
   let file = home ++ "/.week"
   writeFile file $ show week
 

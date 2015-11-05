@@ -10,6 +10,7 @@
 import System.Environment(getArgs)
 import System.IO
 import Calender 
+import Schedule
 import Control.Exception
 import System.Directory
 
@@ -147,6 +148,15 @@ pro = do
               let !n3 = (read x)
               let y2 = removeEventFromYear e n2 n3 q
               putMyCalendar $ addYearToCalendar y2 calendar
+        "createSchedule":_ -> do
+          !w <- createWeek
+          putMyWeek w
+        "showSchedule":_ -> do
+          w <- checkWeek
+          printWeek w
+        "showWorkDay":_ -> do 
+          w <- checkWeek
+          printWeekFromTo w (createTime 8 0) (createTime 20 0) 
         _ -> do
           putStrLn "unknown Command\nKnown Commands:"
           putStrLn "\tshowDay"
