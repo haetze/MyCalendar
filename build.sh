@@ -10,3 +10,4 @@ mkdir -p bin
 ghc ./src/Calender.hs 
 ghc ./src/Schedule.hs 
 ghc -isrc/ ./src/main.hs -o ./bin/main
+cp ./bin/main /usr/local/bin/myCalendar
