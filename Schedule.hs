@@ -16,9 +16,6 @@ module Schedule (
   printWeekFromTo,
   printWeek,
   createTime,
-  createDay,
-  createEventList,
-  createEventAt
 ) where
 
 
