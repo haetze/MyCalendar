@@ -175,6 +175,9 @@ pro = do
           putStrLn "\tremoveEventOnDay <Day #> <Event title, can be more than one word>"
           putStrLn "\tremoveEventOnDayInMonth <Day #> <Month #> <Event, title, can be more than one word>"
           putStrLn "\tremoveEventOnDayInMonthInyear <Day #> <Month #> <Year #> <Event title, can be more than one word>"
+          putStrLn "\tcreateSchedule"
+          putStrLn "\tshowSchedule" 
+          putStrLn "\tshowWorkDay"
           putStrLn "\tBug report? email to richy.sting@gmail.com"
 
 
