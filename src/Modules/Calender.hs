@@ -254,7 +254,7 @@ addNewLine:: String -> String
 addNewLine x = x ++ "\n"
 
 showEventsFromMonth:: Maybe Month -> [String]
-showEventsFromMonth Nothing = ["\tYou have in this no events month.\n"]
+showEventsFromMonth Nothing = ["\tYou have no events this month.\n"]
 showEventsFromMonth (Just (Month i ds)) = do
   let y = "Month Number " ++ show i++".\n"
   let x = map (showEventsFromDay . Just ) . reverse $ sort ds
