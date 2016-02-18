@@ -20,7 +20,8 @@ type Time = String
 
 data Event = Event Title |
   EventDue Title |
-  EventWithTime Title Time 
+  EventWithTime Title Time |
+  EventYearWise Int Int Title
   deriving(Show, Read, Eq)
 
 data Day = Day Int [Event]
@@ -32,7 +33,7 @@ data Month = Month Int [Day]
 data Year = Year Int [Month]
   deriving(Show, Read, Eq)
 
-data Calendar = Calendar [Year]
+data Calendar = Calendar [Year] [Event]
   deriving(Show, Read, Eq)
 
 instance Ord Event where 
@@ -111,7 +112,7 @@ createDay = do
   return (Day (T.ctDay cal) [])  
 
 addYearToCalendar:: Year -> Calendar -> Calendar
-addYearToCalendar (Year i ms) (Calendar xs) = Calendar ys
+addYearToCalendar (Year i ms) (Calendar xs l) = Calendar ys l
   where
     us = filter (\s -> i /= getYearNumber s) xs
     ys = (Year i ms):us 
@@ -136,9 +137,11 @@ getMonthFromYear x (Year i ((Month z ds):ys)) | x==z  = Just $ Month z ds
                 |otherwise= getMonthFromYear x (Year i ys)
 
 getYearFromCalendar:: Int -> Calendar -> Maybe Year
-getYearFromCalendar _ (Calendar [])         = Nothing
-getYearFromCalendar x (Calendar ((Year z ms):ys)) | x==z   = Just $ Year z ms
-              | otherwise   = getYearFromCalendar x (Calendar ys)
+getYearFromCalendar _ (Calendar [] l)         = Nothing
+getYearFromCalendar x (Calendar ((Year z ms):ys) l) | x==z   = Just $ newYear
+              | otherwise   = getYearFromCalendar x (Calendar ys l)
+                where
+                  newYear = addEventsToYear (Year z ms) l
 
 getDayFromMonthFromYear::Int -> Int -> Maybe Year -> Maybe Day
 getDayFromMonthFromYear m d Nothing = Nothing
@@ -167,7 +170,18 @@ addEventToYear e m d year@(Year y ms) = case getMonthFromYear m year of
     where
       r = filter (oldM /= ) ms
       Just newM = addEventToMonth e d oldM
-      ms2 = newM:r 
+      ms2 = newM:r
+
+
+addEventYearWiseToCalendar:: Event -> Calendar -> Calendar
+addEventYearWiseToCalendar e@(EventYearWise _ _ _) (Calendar xs ys) = (Calendar xs (e:ys))
+addEventYearWiseToCalendar _ c = c
+
+addEventsToYear:: Year -> [Event] -> Year
+addEventsToYear y [] = y
+addEventsToYear y ((EventYearWise m d t):xs) = addEventsToYear newYear xs
+  where
+    Just newYear = addEventToYear (Event t) m d y
 
 removeEventFromDay::Event -> Day -> Day
 removeEventFromDay e (Day i es) = Day i es2
@@ -306,6 +320,6 @@ isElem xs = do
     True -> getMyCalendar
     False -> do
       c <- createYear
-      putMyCalendar $ Calendar [c]
-      return $ Calendar [c]
+      putMyCalendar $ Calendar [c] []
+      return $ Calendar [c] []
   

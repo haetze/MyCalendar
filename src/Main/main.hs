@@ -104,7 +104,12 @@ pro = do
           let !n2 = (read y)
           let !n3 = (read x)
           let Just y2 = addEventToYear e n2 n3 thisYear
-          putMyCalendar $ addYearToCalendar y2 calendar 
+          putMyCalendar $ addYearToCalendar y2 calendar
+        "addEventOnDayInMonthEachYear":x:y:xs -> do
+          let !n2 = (read y)
+          let !n3 = (read x)
+          let e = EventYearWise n2 n3  $ unwords xs
+          putMyCalendar $ addEventYearWiseToCalendar e calendar 
         "addEventOnDayInMonthInYear":x:u:w:xs -> do
           let e = Event $ unwords xs
           let !n2 = (read w)
