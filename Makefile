@@ -10,6 +10,6 @@ all: src/Main/main.hs $(OUTPUTS)
 	sudo cp bin/myCal /usr/local/bin/myCal
 
 src/Modules/%.o: src/Modules/%.hs 
-	ghc $< 
+	ghc -isrc/Modules $< 
 
 

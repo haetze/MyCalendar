@@ -13,6 +13,7 @@ import qualified System.Time as T
 import System.Directory
 import System.IO
 import Data.List
+import Unique
 
 type Title = String
 -- hh mm"
@@ -35,6 +36,23 @@ data Year = Year Int [Month]
 
 data Calendar = Calendar [Year] [Event]
   deriving(Show, Read, Eq)
+
+instance Unique Calendar where
+  unique (Calendar ys es) = Calendar (unique ys) (unique es)
+
+instance Unique Year where
+  unique (Year n ms) = Year n (unique ms)
+
+instance Unique Month where
+  unique (Month n ds) = Month n (unique ds)
+
+instance Unique Day where
+  unique (Day n es) = Day n (unique es) 
+
+instance Unique Event where
+  unique e = e
+
+
 
 instance Ord Event where 
   (EventWithTime t xs) < (EventWithTime t2 ys) = converToNumber xs < converToNumber ys
@@ -304,12 +322,9 @@ putMyCalendar::Calendar -> IO ()
 putMyCalendar calendar = do
   home <- getHomeDirectory
   let file = home ++ "/.calendar"
-  writeFile file $ show calendar
+  writeFile file . show $ unique calendar
 
 
-
-f::Int -> Int
-f x = x
 
 checkCalender:: IO Calendar
 checkCalender = getHomeDirectory >>= getDirectoryContents >>= isElem
