@@ -1,15 +1,15 @@
 #Makefile for MyCalendar
 #
 
-INPUTS := $(wildcard src/Modules/*.hs)
-OUTPUTS := $(patsubst src/Modules/%.hs,src/Modules/%.o, $(INPUTS))
+INPUTS := $(wildcard src/*.hs)
+OUTPUTS := $(patsubst src/%.hs,src/%.o, $(INPUTS))
 
-all: src/Main/main.hs $(OUTPUTS)
-	ghc -isrc/Modules src/Main/main.hs
-	cp src/Main/main bin/myCal
+all: src/main.hs $(OUTPUTS)
+	ghc -isrc/ src/main.hs
+	cp src/main bin/myCal
 	sudo cp bin/myCal /usr/local/bin/myCal
 
-src/Modules/%.o: src/Modules/%.hs 
-	ghc -isrc/Modules $< 
+src/%.o: src/%.hs 
+	ghc -isrc/  $< 
 
 
