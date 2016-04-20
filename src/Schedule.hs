@@ -32,6 +32,7 @@ import System.IO
 data Time = Time (Int, Int)
   deriving(Show, Read, Eq)
 
+
 createTime::Int -> Int -> Time
 createTime x y = Time (x, y)
 
@@ -73,6 +74,7 @@ instance Ord Event where
 --Print for Time
 
 toString:: Time -> String
+toString (Time (n, 0)) = show n ++ ":" ++ "00"
 toString (Time (n, u)) = show n ++ ":" ++ show u
 
 toStringEvent:: Event -> String
