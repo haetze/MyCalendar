@@ -111,7 +111,7 @@ createEventAt t = s >> y >>= f
   y = getLine
   f name  = case length name of
     0 -> return $ Event name t --I later want to change this behavior
-    _ -> case length name < 6 of
+    _ -> case length name < 7 of
       True -> return $ Event name t
       False -> return $ Event (take 5 name) t  
 
