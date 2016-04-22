@@ -183,6 +183,7 @@ pro = do
           putStrLn "\tcreateSchedule"
           putStrLn "\tshowSchedule" 
           putStrLn "\tshowWorkDay"
+          putStrLn "\taddEventOnDayInMonthEachYear <Day #> <Month #> <Event, title, can be more than one word>"
           putStrLn "\tBug report? email to richy.sting@gmail.com"
 
 
