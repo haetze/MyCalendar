@@ -1,0 +1,36 @@
+#compdef myCal
+
+_myCal(){
+	local -a commands
+	commands=(
+		'showDay:'
+		'showMonte:'
+		'showMonthNumber:'
+		'showDayInMonth:'
+		'showDayInMonthInYear:'
+		'addEventToday:'
+		'addEventOnDay:'
+		'addEventOnDayInMonth:'
+		'addEventOnDayInMonthInYear:'
+		'addEventWithTimeToday:'
+		'addEventWithTimeOnDay:'
+		'addeEventWithTimeOnDayInMonth:'
+		'removeEventToday:'
+		'removeEventOnDay:'
+		'removeEventOnDayInMonth:'
+		'removeEventOnDayInMonthInYear:'
+		'createSchedule:'
+		'showSchedule:'
+		'showWorkDay:'
+		'addEventOnDayInMonthEachYear:'
+		)
+
+	if (( CURRENT == 2 )); then
+		    _describe -t commands 'commands' commands
+	fi
+
+	return 0
+
+}
+
+_myCal
