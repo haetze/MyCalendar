@@ -4,7 +4,7 @@ _myCal(){
 	local -a commands
 	commands=(
 		'showDay:'
-		'showMonte:'
+		'showMonth:'
 		'showMonthNumber:'
 		'showDayInMonth:'
 		'showDayInMonthInYear:'
